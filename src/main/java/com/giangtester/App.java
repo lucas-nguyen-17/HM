@@ -7,7 +7,6 @@ import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 import java.io.FileWriter;
@@ -29,14 +28,16 @@ public class App {
         driver.get(link);
         driver.manage().timeouts().implicitlyWait(Duration.of(5, ChronoUnit.SECONDS));
         String price = driver.findElement(By.cssSelector(priceTxt)).getText().substring(1);
-        System.out.println("price = " + price);
         String img = driver.findElement(By.xpath(imgLink)).getAttribute("srcset").split(" ")[0];
-        System.out.println("img = " + img);
-        driver.quit();
         Product aProduct = new Product(link, price, img);
+        driver.quit();
         List<Product> list = Collections.singletonList(aProduct);
+        writeToFile(list, args[1]);
+    }
+
+    private static void writeToFile(List<Product> list, String filePath) {
         try {
-            Writer writer = new FileWriter("yourfile.csv");
+            Writer writer = new FileWriter(filePath + "\\yourfile.csv");
             StatefulBeanToCsv<Product> beanToCsv = new StatefulBeanToCsvBuilder<Product>(writer).build();
             beanToCsv.write(list);
             writer.close();
